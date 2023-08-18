@@ -261,7 +261,7 @@ public class BankingApp {
             }
         } while (running);
         File myFile = new File(
-                "C:\\Users\\91810\\OneDrive\\Documents\\Programing\\Java Project\\MyFirstCode\\.vscode\\JAVA\\AccountData.txt");
+                "AccountData.txt");
 
         try {
             FileWriter fileWriter = new FileWriter(myFile);
