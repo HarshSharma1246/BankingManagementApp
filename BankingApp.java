@@ -10,7 +10,7 @@ import java.io.BufferedReader;
 public class BankingApp {
     public static void main(String arg[]) {
         File myFile = new File(
-                "C:\\Users\\91810\\OneDrive\\Documents\\Programing\\Projects\\BankingApp\\AccountData.txt");
+                "/AccountData.txt");
         BankDetails.addFile(myFile); // Adding the Saved Account data file
         Scanner sc = new Scanner(System.in);
         // Home window
