@@ -74,6 +74,13 @@ public class HomePage extends JFrame implements ActionListener {
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                BankDetails.saveDetails(BankingApp.myFile);
+            }
+        });
     }
 
     @Override
