@@ -159,15 +159,4 @@ public class BankDetails {
             e.printStackTrace();
         }
     }
-
-    public static void displayFileContents(File myFile) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(myFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
