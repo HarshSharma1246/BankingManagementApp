@@ -1,9 +1,21 @@
 import java.util.Scanner;
+
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 
 public class BankDetails {
@@ -20,179 +32,142 @@ public class BankDetails {
         this.name = name;
         this.acc_type = acc_type;
         this.balance = balance;
-    }
-
-    public void openAccount(BankDetails newAccount) {
-        System.out.print("\u001b[H\u001b[2J");
-        System.out.flush();
-        System.out.print("Enter Account No: ");
-        boolean rightAcc = false;
-        String ac_no = sc.next();
-
-        while (true) {
-            while (!rightAcc) {
-                try {
-                    Integer.parseInt(ac_no);
-                    rightAcc = true;
-                } catch (Exception e) {
-                    System.out.println("Account number should be in number format. Type the valid number again");
-                    ac_no = sc.next();
-                }
-            }
-            boolean found = false;
-            for (BankDetails b : accounts) {
-                if (b.acc_no.equals(ac_no)) {
-                    System.out
-                            .println("This Account number is already present. Please provide some alternative number:");
-                    found = true;
-                }
-            }
-            if (found) {
-                ac_no = sc.next();
-                rightAcc = false;
-            } else
-                break;
-        }
-        this.acc_no = ac_no;
-        System.out.print("Enter Account type (saving/current): ");
-        acc_type = sc.next();
-        while (!acc_type.toLowerCase().equals("saving") && !acc_type.toLowerCase().equals("current")) {
-            System.out.println("Please choose correct Option\n\nEnter Account type (saving/current):");
-            acc_type = sc.next();
-        }
-        sc.nextLine();
-        System.out.print("Enter Name: ");
-        name = sc.nextLine();
-        System.out.print("Enter Balance: ");
-        boolean rightBalance = false;
-        while (!rightBalance)
-            try {
-                this.balance = sc.nextLong();
-                rightBalance = true;
-            } catch (Exception e) {
-                System.out.print("Balance should be in number format!! Try again...\n\nEnter Balance: ");
-                sc.nextLine();
-            }
         accounts.add(this);
     }
 
-    public void modify(String n) {
-        if (n.equals("1")) {
-            System.out.print("Enter Account No: ");
-            String ac_no = sc.next();
-            while (true) {
-                boolean found = false;
-                for (BankDetails b : accounts) {
-                    if (b.acc_no.equals(ac_no)) {
-                        System.out.println(
-                                "This Account number is already present. Please provide some alternative number:");
-                        found = true;
-                    }
-                }
-                if (found) {
-                    ac_no = sc.next();
-                } else
-                    break;
+    public static BankDetails searchAcc(String accountNumber) {
+        for (BankDetails account : accounts) {
+            if (account.acc_no.equals(accountNumber)) {
+                return account;
             }
-            this.acc_no = ac_no;
-        } else if (n.equals("2")) {
-            System.out.println("Enter new Name: ");
-            this.name = sc.next();
-        } else if (n.equals("3")) {
-            System.out.println("Enter new Account type: ");
-            acc_type = sc.next();
-            while (!acc_type.toLowerCase().equals("saving") && !acc_type.toLowerCase().equals("current")) {
-                System.out.println("Please choose correct Option\n\nEnter Account type (saving/current):");
-                this.acc_type = sc.next();
-            }
-        } else {
-            System.out.println("Invalid choice!!");
         }
+        return null;
     }
 
-    public String details(int i) {
-        return (i + ".         " + acc_no + "         " + name + "         " + acc_type + "         " + balance);
+    public static void modifyAccount(BankDetails bankAcc, String acc_name, String acc_type) {
+        bankAcc.name = acc_name;
+        bankAcc.acc_type = acc_type;
+        JOptionPane.showMessageDialog(null, "Details Modified Successfully", "Success", JOptionPane.DEFAULT_OPTION);
     }
 
-    // method to display account details
-    public void showAccount(int i) {
-        System.out.println(
-                i + ".         " + acc_no + "         " + name + "         " + acc_type + "         " + balance);
+    public static void consumerDetails(BankDetails bankAcc) {
+        JFrame accountDetails = new JFrame();
+        JPanel detailsPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        detailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 100));
+        detailsPanel.add(new JLabel("Account Number:"));
+        detailsPanel.add(new JLabel(bankAcc.acc_no));
+        detailsPanel.add(new JLabel("Account Holder Name:"));
+        detailsPanel.add(new JLabel(bankAcc.name));
+        detailsPanel.add(new JLabel("Account Type:"));
+        detailsPanel.add(new JLabel(bankAcc.acc_type));
+        detailsPanel.add(new JLabel("Balance:"));
+        detailsPanel.add(new JLabel(Long.toString(bankAcc.balance)));
+
+        accountDetails.setLayout(new BorderLayout());
+        accountDetails.add(new JLabel("Consumer Details"), BorderLayout.NORTH);
+        accountDetails.add(detailsPanel, BorderLayout.CENTER);
+        accountDetails.setTitle("Banking App");
+        accountDetails.pack();
+        accountDetails.setLocationRelativeTo(null);
+        accountDetails.setVisible(true);
+        accountDetails.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Create and display the new frame
+                accountDetails.dispose();
+                new HomePage();
+            }
+        });
     }
 
     // method to deposit money
-    public void deposit() {
-        long amt = 0;
-        System.out.println("Enter the amount you want to deposit: ");
-        boolean rightBalance = false;
-        while (!rightBalance)
-            try {
-                amt = sc.nextLong();
-                rightBalance = true;
-            } catch (Exception e) {
-                System.out.print(
-                        "Amount should be in number format!! Try again...\n\nEnter the amount you want to deposit:");
-                sc.nextLine();
-            }
-        System.out.println("Successfully Added!!");
-        balance = balance + amt;
+    public static void deposit(BankDetails bankAcc, long bal) {
+        bankAcc.balance += bal;
+        JOptionPane.showMessageDialog(null, "!! Amount added !! \nUpdated Balance: " + bankAcc.balance, "Success",
+                JOptionPane.DEFAULT_OPTION);
     }
 
     // method to withdraw money
-    public void withdrawal() {
-        System.out.println("Enter the amount you want to withdraw: ");
-        long amt = 0;
-        boolean rightBalance = false;
-        while (!rightBalance)
-            try {
-                amt = sc.nextLong();
-                rightBalance = true;
-            } catch (Exception e) {
-                System.out.print(
-                        "Amount should be in number format!! Try again...\n\nEnter the amount you want to withdraw:");
-                sc.nextLine();
-            }
-        if (balance >= amt) {
-            balance = balance - amt;
-            System.out.println("Balance after withdrawal: " + balance);
+    public static void withdrawal(BankDetails bankAcc, long bal) {
+        if (bankAcc.balance < bal) {
+            JOptionPane.showMessageDialog(null, "Account doesn't have enough balance", "Low Balance",
+                    JOptionPane.ERROR_MESSAGE);
         } else {
-            System.out.println("Your balance is less than " + amt + "\tTransaction failed...!!");
+            bankAcc.balance -= bal;
+            JOptionPane.showMessageDialog(null, "Amount successfully withdrawn\n Updated balance: " + bankAcc.balance,
+                    "Success", JOptionPane.DEFAULT_OPTION);
         }
     }
 
-    public void balanceEnquiry() {
-        System.out.println(acc_no + " : " + balance);
+    public static void balanceEnquiry(BankDetails bankAcc) {
+        JOptionPane.showMessageDialog(null, "Balance: " + bankAcc.balance, "Balance", JOptionPane.INFORMATION_MESSAGE);
+        new HomePage();
     }
 
-    public boolean search(String ac_no) {
-        if (acc_no.equals(ac_no))
-            return true;
-        return (false);
+    public static void closeAccount(BankDetails bankAcc) {
+        int res = JOptionPane.showConfirmDialog(null, "Are you sure you want to remove this account?", "Confirmation",
+                JOptionPane.OK_CANCEL_OPTION);
+        if (res == 0) {
+            JOptionPane.showMessageDialog(null, "Successfully Removed", "Account Deleted", JOptionPane.DEFAULT_OPTION);
+        } else {
+            JOptionPane.showMessageDialog(null, "Cancelled", "", JOptionPane.DEFAULT_OPTION);
+            return;
+        }
+        for (int i = 0; i < accounts.size(); i++) {
+            if (accounts.get(i).equals(bankAcc)) {
+                accounts.remove(i);
+                break;
+            }
+        }
+        bankAcc = null;
+        new HomePage();
     }
 
     public static void addFile(File myFile) {
         try (FileReader fileReader = new FileReader(myFile)) {
             try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
-                bufferedReader.readLine();
-                bufferedReader.readLine();
                 while (bufferedReader.ready()) {
                     String acc_no = "";
                     String name = "";
                     String type = "";
                     long balance = 0;
-                    String data[] = bufferedReader.readLine().split("         ");
-                    acc_no = data[1];
-                    name = data[2];
-                    type = data[3];
-                    balance = Integer.parseInt(data[4]);
-                    BankDetails b = new BankDetails(acc_no, name, type, balance);
-                    accounts.add(b);
+                    String data[] = bufferedReader.readLine().split(",");
+                    acc_no = data[0];
+                    name = data[1];
+                    type = data[2];
+                    balance = Long.parseLong(data[3]);
+                    new BankDetails(acc_no, name, type, balance);
                 }
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
             }
         } catch (NumberFormatException | IOException e1) {
             e1.printStackTrace();
+        }
+    }
+
+    public static void saveDetails(File myFile) {
+        try (FileWriter fileWriter = new FileWriter(myFile)) {
+            for (BankDetails account : accounts) {
+                String detail = account.acc_no + "," + account.name + "," + account.acc_type + ","
+                        + Long.toString(account.balance);
+                fileWriter.write(detail + "\n");
+            }
+            fileWriter.close();
+            System.out.println("Data is saved");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void displayFileContents(File myFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(myFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
